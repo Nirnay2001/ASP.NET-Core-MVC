@@ -1,0 +1,34 @@
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\appsettings.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.staticwebassets.runtime.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.staticwebassets.endpoints.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.exe
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.deps.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.runtimeconfig.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.dll
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\bin\Debug\net8.0\MVC Application.pdb
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.AssemblyInfoInputs.cache
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.AssemblyInfo.cs
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.csproj.CoreCompileInputs.cache
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.RazorAssemblyInfo.cache
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.RazorAssemblyInfo.cs
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\scopedcss\bundle\MVC Application.styles.css
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\scopedcss\projectbundle\MVC Application.bundle.scp.css
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets\msbuild.MVC Application.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets\msbuild.MVC Application.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets\msbuild.build.MVC Application.props
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.MVC Application.props
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.MVC Application.props
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets.pack.json
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.dll
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\refint\MVC Application.dll
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.pdb
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\MVC Application.genruntimeconfig.cache
+C:\Users\skr43\OneDrive\Desktop\.Net Project\MVC Application\obj\Debug\net8.0\ref\MVC Application.dll
