@@ -4,13 +4,10 @@ WORKDIR /app
 
 COPY . .
 
+EXPOSE 9090
+
 RUN dotnet restore
 RUN dotnet publish -c Release -o out
+RUN dotnet run
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
-WORKDIR /app
-
-COPY --from=build /app/out .
-
-ENTRYPOINT ["dotnet","MVC Application.dll"]
