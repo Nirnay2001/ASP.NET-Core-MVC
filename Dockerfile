@@ -8,6 +8,7 @@ EXPOSE 9090
 
 RUN dotnet restore
 RUN dotnet publish -c Release -o out
-RUN dotnet run
+
+ENTRYPOINT ["dotnet", "MVC Application.dll"]
 
 
