@@ -2,65 +2,90 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/Nirnay2001/ASP.NET-Core-MVC.git'
-        ec2_ip = '54.196.204.240'
-        repo_name = 'ASP.NET-Core-MVC'
-        container_name = 'MVC'
+        GIT_REPO     = 'https://github.com/Nirnay2001/ASP.NET-Core-MVC.git'
+        EC2_IP       = '34.228.60.131'
+        REPO_NAME    = 'ASP.NET-Core-MVC'
+        IMAGE_NAME   = 'MVC'
+        DOCKERHUB_IMAGE_NAME = 'nirnay2001/mvc_project'
     }
 
     stages {
 
-        stage('Pull repository') {
+        stage('Pull Repository') {
             steps {
-                sshagent(['ec2-ssh']) {
-                    script {
-                        def repoExists = sh(
-                            script: "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'test -d ~/${repo_name}'",
-                            returnStatus: true
-                        ) == 0
-
-                        if (repoExists) {
-                            sh "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'cd ~/${repo_name} && git pull origin main'"
-                        } else {
-                            sh "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'git clone ${GIT_REPO} ~/${repo_name}'"
-                        }
-                    }
-                }
+                sh """
+                    if [ -d "${REPO_NAME}" ]; then
+                        cd ${REPO_NAME}
+                        git pull origin main
+                    else
+                        git clone ${GIT_REPO}
+                    fi
+                """
             }
         }
 
-        stage('Docker compose down and remove old images') {
+        stage('Docker Build') {
             steps {
-                sshagent(['ec2-ssh']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
-                        'cd ~/${repo_name} && sudo docker compose down || true'
-                    """
-
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
-                        'sudo docker images -aq | xargs -r sudo docker rmi -f'
-                    """
-                }
+                sh """
+                    cd ${REPO_NAME}
+                    docker build -t ${DOCKERHUB_IMAGE_NAME} .
+                    
+                """
             }
         }
 
-        stage('Docker build') {
+        stage('Docker Push') {
             steps {
-                sshagent(['ec2-ssh']) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )
+                ]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
-                        'cd ~/${repo_name} && sudo docker compose build'
+                        echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin
+                        docker push ${DOCKERHUB_IMAGE_NAME}
                     """
                 }
             }
         }
-        stage('Docker run') {
+
+        stage('Copy Compose File To EC2') {
             steps {
                 sshagent(['ec2-ssh']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
-                        'cd ~/${repo_name} && sudo docker compose up -d'
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} 'mkdir -p ~/${REPO_NAME}'
+                        scp -o StrictHostKeyChecking=no \
+                            ${REPO_NAME}/docker-compose.yml \
+                            ubuntu@${EC2_IP}:~/${REPO_NAME}/
+                    """
+                }
+            }
+        }
+
+        stage('Docker Compose Down') {
+            steps {
+                sshagent(['ec2-ssh']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
+                            cd ~/${REPO_NAME}
+                            sudo docker compose down || true
+                        '
+                    """
+                }
+            }
+        }
+
+        stage('Deploy To EC2') {
+            steps {
+                sshagent(['ec2-ssh']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
+                            cd ~/${REPO_NAME}
+                            sudo docker compose pull
+                            sudo docker compose up -d
+                        '
                     """
                 }
             }
@@ -71,19 +96,16 @@ pipeline {
                 sshagent(['ec2-ssh']) {
                     script {
                         sleep(time: 20, unit: 'SECONDS')
+
                         def containers = sh(
                             script: """
-                                ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                                ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} \
                                 'sudo docker ps --format "{{.Names}}"'
                             """,
                             returnStdout: true
                         ).trim()
 
-                        if (!containers.contains(container_name)) {
-                            error("Container ${container_name} is not running.")
-                        }
-
-                        echo "Container ${container_name} is running."
+                        assert containers.contains(IMAGE_NAME), "Container ${IMAGE_NAME} is not running. Current containers: ${containers}"
                     }
                 }
             }
@@ -93,7 +115,7 @@ pipeline {
             steps {
                 script {
                     def response = sh(
-                        script: "curl -s -o /dev/null -w '%{http_code}' http://${ec2_ip}",
+                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_IP}",
                         returnStdout: true
                     ).trim()
 
@@ -108,10 +130,13 @@ pipeline {
     }
 
     post {
+        always {
+            echo 'Cleaning up...'
+            sh "docker logout || true"
+        }
         success {
             echo 'Deployment Successful!'
         }
-
         failure {
             echo 'Deployment Failed!'
         }
