@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         GIT_REPO = 'https://github.com/Nirnay2001/ASP.NET-Core-MVC.git'
-        ec2_ip = '100.27.190.169'
+        ec2_ip = '54.196.204.240'
         repo_name = 'ASP.NET-Core-MVC'
-        container_name = 'app02'
+        container_name = 'MVC'
     }
 
     stages {
@@ -15,7 +15,7 @@ pipeline {
                 sshagent(['ec2-ssh']) {
                     script {
                         def repoExists = sh(
-                            script: "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'ls ~/${repo_name}'",
+                            script: "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'test -d ~/${repo_name}'",
                             returnStatus: true
                         ) == 0
 
@@ -29,43 +29,39 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker compose down and remove old images') {
             steps {
                 sshagent(['ec2-ssh']) {
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'cd ~/${repo_name} && sudo docker build -t ${container_name} .'"
-                }
-            }
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                        'cd ~/${repo_name} && sudo docker compose down || true'
+                    """
 
-            post {
-                success {
-                    echo "Docker image ${container_name}:latest built successfully on EC2."
-                }
-                failure {
-                    echo "Failed to build Docker image ${container_name}:latest."
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                        'sudo docker images -aq | xargs -r sudo docker rmi -f'
+                    """
                 }
             }
         }
 
-        stage('Docker Run') {
+        stage('Docker build') {
             steps {
                 sshagent(['ec2-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} '
-                    sudo docker stop ${container_name} || true
-                    sudo docker rm ${container_name} || true
-                    cd ~/${repo_name}
-                    sudo docker run -d --name ${container_name} -p 80:9090 ${container_name}
-                    '
+                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                        'cd ~/${repo_name} && sudo docker compose build'
                     """
                 }
             }
-
-            post {
-                success {
-                    echo "Docker container ${container_name} started successfully."
-                }
-                failure {
-                    echo "Failed to start Docker container."
+        }
+        stage('Docker run') {
+            steps {
+                sshagent(['ec2-ssh']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                        'cd ~/${repo_name} && sudo docker compose up -d'
+                    """
                 }
             }
         }
@@ -74,14 +70,20 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh']) {
                     script {
+                        sleep(time: 20, unit: 'SECONDS')
                         def containers = sh(
                             script: """
-                            ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} 'sudo docker ps --format "{{.Names}}"'
+                                ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \
+                                'sudo docker ps --format "{{.Names}}"'
                             """,
                             returnStdout: true
                         ).trim()
 
-                        assert containers.contains("${container_name}") : "Container ${container_name} is not running."
+                        if (!containers.contains(container_name)) {
+                            error("Container ${container_name} is not running.")
+                        }
+
+                        echo "Container ${container_name} is running."
                     }
                 }
             }
@@ -98,10 +100,20 @@ pipeline {
                     if (response == '200') {
                         echo "Frontend is accessible."
                     } else {
-                        error "Frontend returned HTTP ${response}"
+                        error("Frontend returned HTTP ${response}")
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment Successful!'
+        }
+
+        failure {
+            echo 'Deployment Failed!'
         }
     }
 }
