@@ -1,7 +1,7 @@
 services:
   web:
   
-    build: .
+    image: nirnay2001/mvc_project:latest
     container_name: MVC
     restart: unless-stopped
     ports:
